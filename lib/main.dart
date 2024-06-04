@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_qr_scanner/QRScanner/qr_code_info_screen.dart';
 import 'package:flutter_qr_scanner/QRScanner/qr_code_scanner.dart';
 
 void main() {

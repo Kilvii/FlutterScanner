@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -24,7 +23,8 @@ class _QRCodeInfoScreenState extends State<QRCodeInfoScreen> {
     super.initState();
     splittedData = widget._qrCodeInfo.split('; ');
     final String phoneNumber = splittedData[6];
-    final String cleanedPhoneNumber = "+" + phoneNumber.replaceAll(new RegExp(r'\s|-'), '');
+    final String cleanedPhoneNumber = "+" +
+        phoneNumber.replaceAll(new RegExp(r'\s|-'), '');
     splittedData[6] = cleanedPhoneNumber;
     age = int.parse(splittedData[5]);
     classroom = int.parse(splittedData[10]);
@@ -32,14 +32,13 @@ class _QRCodeInfoScreenState extends State<QRCodeInfoScreen> {
     passport_number = int.parse(splittedData[14]);
 
     _sendDataToServer();
-
   }
 
   Future<void> _sendDataToServer() async {
     final Dio dio = Dio();
 
     final response = await dio.post(
-      'http://5.42.220.6:3000/api/users/store',
+      'http://5.42.220.6:3000/api/participants/store',
       data: {
         "surname": splittedData[0],
         "firstname": splittedData[1],
@@ -66,23 +65,66 @@ class _QRCodeInfoScreenState extends State<QRCodeInfoScreen> {
   @override
   Widget build(BuildContext context) {
     if (_response.isEmpty) {
-      return Center(child:
-      SizedBox( width: 30, height: 30, child: CircularProgressIndicator()));
+      return Center(child: SizedBox(
+          width: 30, height: 30, child: CircularProgressIndicator()));
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('QR Code Info'),
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            Text('${_response['user']['surname']} ${_response['user']['firstname']} ${_response['user']['patronymic']}'),
-            Text('Садится в аудиторию №${_response['user']['room_id']}'),
-            Text('На место под номером №${_response['user']['seat']}'),
-          ],
+    if (!_response.containsKey('user')) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('QR Code Info'),
         ),
-      ),
-    );
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // add this line
+            children: [
+              Text(
+                'Невозможно добавить участника.',
+                style: TextStyle(fontSize: 24), // add this line
+              ),
+              Text(
+                'Причина: ${_response['message']}',
+                style: TextStyle(fontSize: 24), // add this line
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('QR Code Info'),
+        ),
+        body: Container(
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  '${_response['user']['surname']} ${_response['user']['firstname']} ${_response['user']['patronymic']}',
+                  style: TextStyle(fontSize: 24),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  'Садится в аудиторию №${_response['user']['room_id']}',
+                  style: TextStyle(fontSize: 24),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  'На место под номером №${_response['user']['seat']}',
+                  style: TextStyle(fontSize: 24),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }

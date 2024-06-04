@@ -40,7 +40,6 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Text(_qrCodeResult),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _scanQRCode,
